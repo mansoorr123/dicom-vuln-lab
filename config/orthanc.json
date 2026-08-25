@@ -1,0 +1,67 @@
+{
+  // ===== Lab settings (DICOM-VULN-LAB) =====
+  "Name": "DICOM-VULN-LAB",
+  "RegisteredUsers": { "admin": "admin" },
+
+  "HttpServerEnabled": true,
+  "HttpPort": 8042,
+
+  "DicomServerEnabled": true,
+  "DicomAet": "DICOM-VULN-LAB",
+  "DicomPort": 4242,
+  "DicomCheckModalityHost": false,
+
+  // Permissive lab posture - intentionally vulnerable. Because DicomCheckCalledAet is false, the node also
+  // answers to any called AE title. Flip it true + AlwaysAllow* false to test
+  // AE-title-based access control.
+  "DicomCheckCalledAet": false,
+  "DicomAlwaysAllowEcho": true,
+  "DicomAlwaysAllowFind": true,
+  "DicomAlwaysAllowFindWorklist": true,
+  "DicomAlwaysAllowGet": true,
+  "DicomAlwaysAllowMove": true,
+  "DicomAlwaysAllowStore": true,
+  "UnknownSopClassAccepted": true,
+
+  // Mimic modality/workstation AEs and DICOM servers (valid C-MOVE destinations).
+  "DicomModalities": {
+    "SELF"    : [ "DICOM-VULN-LAB", "127.0.0.1", 4242 ],
+    "WORKSTN": [ "WORKSTN", "127.0.0.1", 11112 ],
+    "CT01":    [ "CT01",    "127.0.0.1", 11113 ],
+    "MR01":    [ "MR01",    "127.0.0.1", 11114 ],
+    "US01":    [ "US01",    "127.0.0.1", 11115 ]
+  },
+
+  // Modality Worklist served from /worklists.
+  "Worklists": {
+    "Enable": true,
+    "Database": "/worklists"
+  },
+
+  //"IndexDirectory": "/var/lib/orthanc/db",
+  "StorageCompression": false
+
+  // // ===== Preserved image defaults (from the generated config) =====
+  // "StorageDirectory": "/var/lib/orthanc/db",
+  // "RemoteAccessAllowed": true,
+  // "AuthenticationEnabled": true,
+  // "HttpsCACertificates": "/etc/ssl/certs/ca-certificates.crt",
+  // "Plugins": [
+  //   "/run/orthanc/plugins",
+  //   "/usr/share/orthanc/plugins"
+  // ],
+  // "Gdcm": {
+  //   "Throttling": 4,
+  //   "RestrictTransferSyntaxes": [
+  //     "1.2.840.10008.1.2.4.90",
+  //     "1.2.840.10008.1.2.4.91",
+  //     "1.2.840.10008.1.2.4.92",
+  //     "1.2.840.10008.1.2.4.93"
+  //   ]
+  // },
+  // "OrthancExplorer2": {
+  //   "Enable": true,
+  //   "IsDefaultOrthancUI": false
+  // },
+
+}
