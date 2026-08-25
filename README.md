@@ -70,7 +70,7 @@ retrieving patient studies, then modifying one and uploading it
 back to the server.
 
 ```bash
-# Entering docker shell (optional if dcmtk not installed on the host machine)
+# Entering docker shell (optional if dcmtk already installed on the host/attacking machine)
 sudo docker exec -it dicom-vuln-lab /bin/bash
 
 # connectivity
