@@ -149,11 +149,11 @@ python3 scripts/generate_worklist.py --outdir testdata/worklists --count 14
 ## Removing the Lab
 
 To tear the lab down, stop the container (it's auto-removed thanks to
-`--rm`), then remove the built image and the base Orthanc image:
+`--rm`), then remove the built image:
 
 ```bash
-docker stop dicom-vuln-lab
-docker rmi dicom-vuln-lab orthancteam/orthanc:24.10.1
+sudo docker stop dicom-vuln-lab
+sudo docker rmi dicom-vuln-lab
 ```
 
 ## Notes
