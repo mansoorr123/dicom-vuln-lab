@@ -76,6 +76,11 @@ sudo docker exec -it dicom-vuln-lab /bin/bash
 # connectivity
 echoscu -v -aet PROBE -aec DICOM-VULN-LAB localhost 4242
 
+# query patients
+findscu -P -aet PROBE -aec DICOM-VULN-LAB localhost 4242 \
+  -k QueryRetrieveLevel=PATIENT -k PatientName= -k PatientID= \
+  -k (0010,0030)= -k PatientSex=
+
 # query studies
 findscu -S -aet PROBE -aec DICOM-VULN-LAB localhost 4242 \
   -k QueryRetrieveLevel=STUDY -k PatientName= -k PatientID= \
@@ -101,7 +106,7 @@ movescu -v -S -aet PROBE -aec DICOM-VULN-LAB -aem WORKSTN localhost 4242 \
 sudo docker exec -it dicom-vuln-lab ls -la /data/received/WORKSTN
 
 # Modifying an existing study and uploading back to the server
-dcmodify -gst -gse -gin received/CT.1.2.826.0.1.3680043.8.498.19302764131231232520964555776562846344 
+dcmodify -m "StudyDate=20260912" -gst -gse -gin received/CT.1.2.826.0.1.3680043.8.498.19302764131231232520964555776562846344 
 
 # Dumping meta data of the DICOM study file (StudyInstanceUID got changed creating new study)
 dcmdump received/CT.1.2.826.0.1.3680043.8.498.19302764131231232520964555776562846344* 
